@@ -1,0 +1,24 @@
+.sidebar {
+    width: 220px;
+    height: 100vh;
+    background: white;
+    border-right: 1px solid #ddd;
+    padding: 20px;
+    position: fixed;
+}
+
+.sidebar h2 {
+    margin-bottom: 30px;
+}
+
+.sidebar nav a {
+    display: block;
+    padding: 10px 0;
+    color: black;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.sidebar nav a.active {
+    color: purple;
+}
