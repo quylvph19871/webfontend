@@ -8,7 +8,10 @@ const Sidebar = () => {
             <h2>FShort Hello</h2>
             <nav>
                 <NavLink to="/" end>Dashboard</NavLink>
-
+                <NavLink to="/products">Quản lý sản phẩm</NavLink>
+                <NavLink to="/users">Quản lý người dùng</NavLink>
+                <NavLink to="/orders">Quản lý đơn hàng</NavLink>
+                <NavLink to="/stats">Thống kê</NavLink>
             </nav>
         </div>
     );

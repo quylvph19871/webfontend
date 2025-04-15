@@ -15,11 +15,4 @@ export const loginUser = async (userData) => {
   return res;
 };
 
-// Đăng xuất
-export const logoutUser = async () => {
-  const refreshToken = localStorage.getItem('refreshToken');
-  await api.post('/logout', { refreshToken });
-  localStorage.removeItem('accessToken');
-  localStorage.removeItem('refreshToken');
-  window.location.href = '/login';
-};
+
