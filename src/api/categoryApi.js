@@ -7,3 +7,9 @@ export const getCategories = (token) => {
     });
 };
 
+export const createCategory = (name, token) => {
+    return axios.post('/categories/createCategory', { name }, {
+        headers: { Authorization: `Bearer ${token}` }
+    });
+};
+

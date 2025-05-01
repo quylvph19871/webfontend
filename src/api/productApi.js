@@ -56,3 +56,22 @@ export const updateProduct = async (id, productData, token) => {
     }
 };
 
+// Chuyển đổi trạng thái đang bán <-> ngừng bán
+// Cập nhật trạng thái sản phẩm (true: đang bán, false: ngừng bán)
+export const toggleProductStatus = (productId, status, token) => {
+    console.log("🔄 Gọi toggleProductStatus:", productId, "->", status);
+    return axios.patch(`/products/toggleActive/${productId}`, {}, {
+        headers: {
+            Authorization: `Bearer ${token}`
+        }
+    }).then(res => {
+        console.log("Phản hồi đổi trạng thái:", res.data);
+        return res;
+    }).catch(err => {
+        console.error("Lỗi khi gọi toggleProductStatus:", err);
+        throw err;
+    });
+};
+
+
+
