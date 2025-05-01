@@ -4,10 +4,7 @@ import {
     Box,
     Button,
     Chip,
-    Grid,
-    MenuItem,
     Paper,
-    Select,
     Table,
     TableBody,
     TableCell,
@@ -22,8 +19,6 @@ import { getCategories } from '../api/categoryApi';
 const ProductList = () => {
     const [products, setProducts] = useState([]);
     const [categories, setCategories] = useState([]);
-    const [categoryFilter, setCategoryFilter] = useState('');
-    const [statusFilter, setStatusFilter] = useState('');
     const navigate = useNavigate();
     const token = localStorage.getItem('token');
 
@@ -59,19 +54,6 @@ const ProductList = () => {
         fetchCategories();
     }, [fetchProducts, fetchCategories]);
 
-    const filteredProducts = products.filter(product => {
-        const categoryMatch = categoryFilter
-            ? product.category === categoryFilter || product.category?._id === categoryFilter
-            : true;
-
-        const statusMatch =
-            statusFilter !== ''
-                ? product.is_active === (statusFilter === 'active')
-                : true;
-
-        return categoryMatch && statusMatch;
-    });
-
     return (
         <Box p={2} sx={{ backgroundColor: '#eee', minHeight: '100vh' }}>
             <Paper elevation={3} sx={{ p: 3 }}>
@@ -79,40 +61,14 @@ const ProductList = () => {
                     Quản lý sản phẩm
                 </Typography>
 
-                <Grid container spacing={2} mb={2}>
-                    <Grid item xs={6} md={6}>
-                        <Select
-                            fullWidth
-                            displayEmpty
-                            value={categoryFilter}
-                            onChange={(e) => setCategoryFilter(e.target.value)}
-                        >
-                            <MenuItem value="">Tất cả danh mục</MenuItem>
-                            {categories.map((cat) => (
-                                <MenuItem key={cat._id} value={cat._id}>
-                                    {cat.name}
-                                </MenuItem>
-                            ))}
-                        </Select>
-                    </Grid>
-                    <Grid item xs={6} md={4}>
-                        <Select
-                            fullWidth
-                            displayEmpty
-                            value={statusFilter}
-                            onChange={(e) => setStatusFilter(e.target.value)}
-                        >
-                            <MenuItem value="">Tất cả trạng thái</MenuItem>
-                            <MenuItem value="active">Đang bán</MenuItem>
-                            <MenuItem value="inactive">Ngừng bán</MenuItem>
-                        </Select>
-                    </Grid>
-                    <Grid item xs={12} md={2}>
-                        <Button variant="contained" color="success" fullWidth onClick={() => navigate('/products/create')}>
-                            + Thêm
-                        </Button>
-                    </Grid>
-                </Grid>
+                <Button
+                    variant="contained"
+                    color="success"
+                    onClick={() => navigate('/products/create')}
+                    sx={{ mb: 2 }}
+                >
+                    + Thêm sản phẩm
+                </Button>
 
                 <TableContainer component={Paper}>
                     <Table>
@@ -123,10 +79,11 @@ const ProductList = () => {
                                 <TableCell>Danh mục</TableCell>
                                 <TableCell>Ảnh</TableCell>
                                 <TableCell>Trạng thái</TableCell>
+                                <TableCell>Hành động</TableCell>
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {filteredProducts.map((product) => (
+                            {products.map((product) => (
                                 <TableRow key={product._id}>
                                     <TableCell>{product.name_product}</TableCell>
                                     <TableCell>{product.price}₫</TableCell>
@@ -152,6 +109,16 @@ const ProductList = () => {
                                             onClick={() => handleToggleStatus(product._id, product.is_active)}
                                             clickable
                                         />
+                                    </TableCell>
+                                    <TableCell>
+                                        <Button
+                                            variant="outlined"
+                                            color="primary"
+                                            size="small"
+                                            onClick={() => navigate(`/products/edit/${product._id}`)}
+                                        >
+                                            Sửa
+                                        </Button>
                                     </TableCell>
                                 </TableRow>
                             ))}

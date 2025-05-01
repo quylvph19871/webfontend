@@ -40,3 +40,19 @@ export const createProduct = async (productData, token) => {
 };
 
 
+// Cập nhật sản phẩm
+export const updateProduct = async (id, productData, token) => {
+    try {
+        const response = await axios.put(`/products/updateProducts/${id}`, productData, {
+            headers: {
+                Authorization: `Bearer ${token}`,
+                'Content-Type': 'application/json'  // Content-Type là 'application/json' nếu bạn gửi JSON
+            }
+        });
+        return response.data;
+    } catch (error) {
+        console.error('Lỗi khi cập nhật sản phẩm:', error.response ? error.response.data : error.message);
+        throw error;
+    }
+};
+
