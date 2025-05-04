@@ -1,5 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { getOrders } from "../api/orderApi"; // Giả sử bạn đã có file này
+import { useNavigate } from "react-router-dom";
+import { getOrders } from "../api/orderApi";
+import { toast, ToastContainer } from "react-toastify";
 import useDebounce from "../useHooks/useDebounce";
 
 const OrderList = () => {
@@ -8,8 +10,9 @@ const OrderList = () => {
   const [filterStatus, setFilterStatus] = useState("");
   const [fromDate, setFromDate] = useState("");
   const [toDate, setToDate] = useState("");
-  const [error, setError] = useState("");
+  const [error, setError] = useState(""); // State for error message
   const debouncedSearch = useDebounce(filterPhone, 500);
+  const navigate = useNavigate();
 
   const fetchOrders = async () => {
     try {
@@ -20,9 +23,9 @@ const OrderList = () => {
         toDate,
       });
       setOrders(res.data);
-      setError("");
-    } catch (err) {
-      console.error("Lỗi lấy danh sách đơn hàng:", err);
+      setError(""); // Reset error if fetch is successful
+    } catch (error) {
+      console.error("Lỗi lấy danh sách đơn hàng:", error);
       setError("Không thể tải danh sách đơn hàng.");
     }
   };
@@ -31,101 +34,126 @@ const OrderList = () => {
     fetchOrders();
   }, [debouncedSearch, filterStatus, fromDate, toDate]);
 
+  const formatDate = (dateString) => {
+    const options = { year: "numeric", month: "2-digit", day: "2-digit" };
+    return new Date(dateString).toLocaleDateString("vi-VN", options);
+  };
+
+  const handleDetail = (id) => {
+    navigate(`/orders/${id}`);
+  };
+
   return (
-    <div
-      style={{
-        padding: "20px",
-        backgroundColor: "#f0f0f0",
-        minHeight: "100vh",
-      }}
-    >
-      <div style={styles.container}>
-        <h2 style={styles.title}>Quản lý đơn hàng</h2>
+    <>
+      <ToastContainer />
+      <div
+        style={{
+          padding: "20px",
+          backgroundColor: "#f0f0f0",
+          minHeight: "100vh",
+        }}
+      >
+        <div style={styles.container}>
+          <h2 style={styles.title}>Quản lý đơn hàng</h2>
 
-        <div style={styles.filterContainer}>
-          <select
-            value={filterStatus}
-            onChange={(e) => setFilterStatus(e.target.value)}
-            style={styles.input}
-          >
-            <option value="">Tất cả trạng thái</option>
-            <option value="Pending">Chờ xử lý</option>
-            <option value="Processed">Đã xử lý</option>
-            <option value="Delivered">Đã giao</option>
-            <option value="Cancelled">Đã hủy</option>
-          </select>
-          <input
-            type="date"
-            value={fromDate}
-            onChange={(e) => setFromDate(e.target.value)}
-            style={styles.input}
-          />
-          <input
-            type="date"
-            value={toDate}
-            onChange={(e) => setToDate(e.target.value)}
-            style={styles.input}
-          />
-          <input
-            type="text"
-            placeholder="Tìm theo số điện thoại hoặc tên"
-            value={filterPhone}
-            onChange={(e) => setFilterPhone(e.target.value)}
-            style={styles.input}
-          />
-          <button
-            onClick={() => {
-              setFilterPhone("");
-              setFilterStatus("");
-              setFromDate("");
-              setToDate("");
-            }}
-            style={styles.clearBtn}
-          >
-            Xóa lọc
-          </button>
-        </div>
+          <div style={styles.filterContainer}>
+            <select
+              value={filterStatus}
+              onChange={(e) => setFilterStatus(e.target.value)}
+              style={styles.input}
+            >
+              <option value="">Tất cả trạng thái</option>
+              <option value="Pending">Chờ xử lý</option>
+              <option value="Processed">Đã xử lý</option>
+              <option value="Delivered">Đã giao</option>
+              <option value="Cancelled">Đã hủy</option>
+            </select>
+            <input
+              type="date"
+              value={fromDate}
+              onChange={(e) => setFromDate(e.target.value)}
+              style={styles.input}
+            />
+            <input
+              type="date"
+              value={toDate}
+              onChange={(e) => setToDate(e.target.value)}
+              style={styles.input}
+            />
+            <input
+              type="text"
+              placeholder="Tìm theo số điện thoại hoặc tên người mua"
+              value={filterPhone}
+              onChange={(e) => setFilterPhone(e.target.value)}
+              style={styles.input}
+            />
+            <button
+              onClick={() => {
+                setFilterPhone("");
+                setFilterStatus("");
+                setFromDate("");
+                setToDate("");
+              }}
+              style={styles.clearBtn}
+            >
+              Xóa bộ lọc
+            </button>
+          </div>
 
-        {error && <p style={{ color: "red", textAlign: "center" }}>{error}</p>}
+          {error && (
+            <p style={{ color: "red", textAlign: "center" }}>{error}</p>
+          )}
 
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.th}>Người nhận</th>
-              <th style={styles.th}>SĐT</th>
-              <th style={styles.th}>Trạng thái</th>
-              <th style={styles.th}>Ngày đặt</th>
-            </tr>
-          </thead>
-          <tbody>
-            {orders.length === 0 ? (
+          <table style={styles.table}>
+            <thead>
               <tr>
-                <td
-                  colSpan="4"
-                  style={{ textAlign: "center", padding: "16px" }}
-                >
-                  Không có đơn hàng nào
-                </td>
+                <th style={styles.th}>Người nhận</th>
+                <th style={styles.th}>Số điện thoại</th>
+                <th style={styles.th}>Trạng thái</th>
+                <th style={styles.th}>Ngày đặt</th>
+                <th style={styles.th}>Chi tiết</th>
               </tr>
-            ) : (
-              orders.map((order, idx) => (
-                <tr key={idx} style={{ textAlign: "center" }}>
-                  <td style={styles.td}>{order.shippingAddress.name}</td>
-                  <td style={styles.td}>{order.shippingAddress.phoneNumber}</td>
-                  <td style={styles.td}>{order.status}</td>
-                  <td style={styles.td}>
-                    {new Date(order.orderDate).toLocaleString("vi-VN", {
-                      timeZone: "Asia/Ho_Chi_Minh",
-                      hour12: false,
-                    })}
+            </thead>
+            <tbody>
+              {orders.length === 0 ? (
+                <tr>
+                  <td
+                    colSpan="5"
+                    style={{ textAlign: "center", padding: "16px" }}
+                  >
+                    Không có đơn hàng nào
                   </td>
                 </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+              ) : (
+                orders.map((order, index) => (
+                  <tr key={index} style={{ textAlign: "center" }}>
+                    <td style={styles.td}>{order.shippingAddress.name}</td>
+                    <td style={styles.td}>
+                      {order.shippingAddress.phoneNumber}
+                    </td>
+                    <td style={styles.td}>{order.status}</td>
+                    <td style={styles.td}>
+                      {new Date(order.orderDate).toLocaleString("vi-VN", {
+                        timeZone: "Asia/Ho_Chi_Minh",
+                        hour12: false,
+                      })}
+                    </td>
+                    <td style={styles.td}>
+                      <button
+                        onClick={() => handleDetail(order._id)}
+                        style={styles.detailBtn}
+                      >
+                        Xem
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
@@ -160,6 +188,14 @@ const styles = {
     padding: "8px",
     borderBottom: "1px solid #ddd",
     whiteSpace: "nowrap",
+  },
+  detailBtn: {
+    padding: "4px 8px",
+    backgroundColor: "#4caf50",
+    color: "#fff",
+    border: "none",
+    borderRadius: "4px",
+    cursor: "pointer",
   },
   filterContainer: {
     display: "flex",
