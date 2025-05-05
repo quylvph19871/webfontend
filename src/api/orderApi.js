@@ -10,3 +10,7 @@ export const getOrders = (filters) => {
 export const updateOrderStatus = (orderId, status) => {
   return api.put(`/order/update/${orderId}`, { status });
 };
+
+export const getDetail = (orderId) => {
+  return api.get(`/order/getDetail/${orderId}`);
+};
