@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { getOrders } from "../api/orderApi";
+import { getOrders, updateOrderStatus } from "../api/orderApi";
 import { toast, ToastContainer } from "react-toastify";
 import useDebounce from "../useHooks/useDebounce";
 
@@ -41,6 +41,29 @@ const OrderList = () => {
 
   const handleDetail = (id) => {
     navigate(`/orders/${id}`);
+  };
+
+  const handleStatusChange = async (orderId, newStatus) => {
+    const isConfirmed = window.confirm(
+      "Bạn có chắc chắn muốn thay đổi trạng thái này?"
+    );
+
+    if (!isConfirmed) {
+      return; // Nếu người dùng chọn "Cancel", không làm gì cả
+    }
+
+    try {
+      await updateOrderStatus(orderId, newStatus);
+      setOrders((prev) =>
+        prev.map((order) =>
+          order._id === orderId ? { ...order, status: newStatus } : order
+        )
+      );
+      toast.success("Cập nhật trạng thái đơn hàng thành công");
+    } catch (error) {
+      console.error("Lỗi khi cập nhật trạng thái:", error);
+      alert("Cập nhật trạng thái thất bại");
+    }
   };
 
   return (
@@ -131,7 +154,47 @@ const OrderList = () => {
                     <td style={styles.td}>
                       {order.shippingAddress.phoneNumber}
                     </td>
-                    <td style={styles.td}>{order.status}</td>
+                    <td style={styles.td}>
+                      <select
+                        value={order.status}
+                        onChange={(e) =>
+                          handleStatusChange(order._id, e.target.value)
+                        }
+                        style={{ padding: "4px", borderRadius: "4px" }}
+                        disabled={
+                          order.status === "Delivered" ||
+                          order.status === "Cancelled"
+                        }
+                      >
+                        {order.status === "Pending" && (
+                          <option value="Pending">Chờ xử lý</option>
+                        )}
+                        <option
+                          value="Processed"
+                          disabled={
+                            order.status === "Delivered" ||
+                            order.status === "Cancelled"
+                          }
+                        >
+                          Đang giao hàng
+                        </option>
+                        <option
+                          value="Delivered"
+                          disabled={order.status !== "Processed"}
+                        >
+                          Đã giao
+                        </option>
+                        <option
+                          value="Cancelled"
+                          disabled={
+                            order.status !== "Pending" &&
+                            order.status !== "Processed"
+                          }
+                        >
+                          Đã hủy
+                        </option>
+                      </select>
+                    </td>
                     <td style={styles.td}>
                       {new Date(order.orderDate).toLocaleString("vi-VN", {
                         timeZone: "Asia/Ho_Chi_Minh",

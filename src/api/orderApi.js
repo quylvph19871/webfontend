@@ -7,3 +7,6 @@ export const getOrders = (filters) => {
     params: filters,
   });
 };
+export const updateOrderStatus = (orderId, status) => {
+  return api.put(`/order/update/${orderId}`, { status });
+};
