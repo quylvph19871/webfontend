@@ -2,6 +2,16 @@ import React, { useEffect, useState } from "react";
 import { useParams } from "react-router-dom";
 import { getDetail } from "../api/orderApi";
 
+const paymentMethods = {
+  Momo: "Trả trước bằng Momo",
+  "Cash On Delivery": "Thanh toán khi nhận được hàng",
+};
+
+const paymentStatus = {
+  Paid: "Đã thanh toán",
+  Unpaid: "Chưa thanh toán",
+};
+
 const STATUS = {
   Pending: "Đang chờ xử lý",
   Processed: "Đã xử lý và đang chuẩn bị giao hàng",
@@ -61,6 +71,70 @@ const OrderDetail = () => {
       <div style={styles.section}>
         <h3>Ngày đặt hàng</h3>
         <p>{new Date(order.orderDate).toLocaleString("vi-VN")}</p>
+      </div>
+
+      {/* Phần 8: Thông tin người nhận */}
+      <div style={styles.section}>
+        <h3>Thông tin người nhận</h3>
+        <p>
+          <strong>Tên:</strong> {order?.shippingAddress?.name}
+        </p>
+        <p>
+          <strong>Số điện thoại:</strong> {order?.shippingAddress?.phoneNumber}
+        </p>
+        <p>
+          <strong>Địa chỉ:</strong> {order?.shippingAddress?.address}
+        </p>
+      </div>
+
+      {/* Phần 9: Thông tin sản phẩm */}
+      <div style={styles.section}>
+        <h3>Sản phẩm đã mua</h3>
+        <table style={styles.table}>
+          <thead>
+            <tr>
+              <th style={styles.tableHeader}>Sản phẩm</th>
+              <th style={styles.tableHeader}>Tên sản phẩm</th>
+              <th style={styles.tableHeader}>Màu sắc</th>
+              <th style={styles.tableHeader}>Size</th>
+              <th style={styles.tableHeader}>Số lượng</th>
+              <th style={styles.tableHeader}>Giá</th>
+            </tr>
+          </thead>
+          <tbody>
+            {order?.products.map((product, index) => (
+              <tr key={index}>
+                <td style={styles.tableCell}>{product?.productId?._id}</td>
+                <td style={styles.tableCell}>
+                  {product?.productId?.name_product}
+                </td>
+                <td style={styles.tableCell}>{product.color}</td>
+                <td style={styles.tableCell}>{product.size}</td>
+                <td style={styles.tableCell}>{product.quantity}</td>
+                <td style={styles.tableCell}>
+                  {product.price.toLocaleString()} VND
+                </td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+      </div>
+
+      {/* Phần 10 & 11: Tổng tiền & thanh toán */}
+      <div style={styles.section}>
+        <h3>Tổng số tiền</h3>
+        <p>
+          <strong>Tổng số tiền:</strong> {order.totalAmount.toLocaleString()}{" "}
+          VND
+        </p>
+        <p>
+          <strong>Phương thức thanh toán:</strong>{" "}
+          {paymentMethods[order.paymentMethod]}
+        </p>
+        <p>
+          <strong>Trạng thái thanh toán:</strong>{" "}
+          {paymentStatus[order.paymentStatus]}
+        </p>
       </div>
 
       {/* Phần 6: Trạng thái đơn hàng */}
@@ -125,6 +199,27 @@ const styles = {
     borderRadius: "6px",
     marginBottom: "10px",
     transition: "background-color 0.3s ease",
+  },
+  table: {
+    width: "100%",
+    borderCollapse: "collapse",
+    marginBottom: "20px",
+  },
+  tableHeader: {
+    padding: "12px",
+    border: "1px solid #ddd",
+    backgroundColor: "#f8f9fa",
+    textAlign: "left",
+    fontWeight: "bold",
+    color: "#333",
+    fontSize: "16px",
+  },
+  tableCell: {
+    padding: "12px",
+    border: "1px solid #ddd",
+    textAlign: "left",
+    color: "#555",
+    fontSize: "14px",
   },
 };
 
