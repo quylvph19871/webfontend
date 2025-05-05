@@ -1,17 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { getDetail } from "../api/orderApi";
-
+import backImage from "../assets/img.png";
 const paymentMethods = {
   Momo: "Trả trước bằng Momo",
   "Cash On Delivery": "Thanh toán khi nhận được hàng",
 };
-
-const paymentStatus = {
-  Paid: "Đã thanh toán",
-  Unpaid: "Chưa thanh toán",
-};
-
 const STATUS = {
   Pending: "Đang chờ xử lý",
   Processed: "Đã xử lý và đang chuẩn bị giao hàng",
@@ -19,32 +13,33 @@ const STATUS = {
   Cancelled: "Đơn hàng bị hủy",
 };
 
+const paymentStatus = {
+  Paid: "Đã thanh toán",
+  Unpaid: "Chưa thanh toán",
+};
+
 const OrderDetail = () => {
-  // Phần 1: Lấy id từ URL
-  const { id } = useParams();
-
-  // Phần 2: Khai báo state lưu đơn hàng
+  const { id } = useParams(); // Lấy id từ URL
   const [order, setOrder] = useState(null);
-
-  // Phần 3: Hàm đổi màu trạng thái
+  const navigate = useNavigate();
   const getStatusColor = (status) => {
     switch (status) {
       case "Pending":
-        return "#FFCC00";
+        return "#FFCC00"; // Màu vàng
       case "Processed":
-        return "#28a745";
+        return "#28a745"; // Màu xanh lá
       case "Delivered":
-        return "#007bff";
+        return "#007bff"; // Màu xanh dương
       default:
-        return "#6c757d";
+        return "#6c757d"; // Màu xám
     }
   };
 
-  // Phần 4: Gọi API lấy chi tiết đơn hàng
   useEffect(() => {
     const fetchOrder = async () => {
       try {
         const res = await getDetail(id);
+        console.log(res.data);
         if (res.data) {
           setOrder(res.data);
         } else {
@@ -55,25 +50,32 @@ const OrderDetail = () => {
         setOrder(null);
       }
     };
+
     fetchOrder();
   }, [id]);
 
-  // Phần 5: Loading
   if (!order) {
     return <div>Đang tải dữ liệu...</div>;
   }
 
   return (
     <div style={styles.container}>
-      <h2 style={styles.title}>Chi tiết đơn hàng</h2>
+      {/* Nút Back */}
+      {/* Nút Back với hình ảnh */}
+      <button
+        onClick={() => navigate(-1)} // Quay lại trang trước đó
+        style={styles.backButton}
+      >
+        <img src={backImage} alt="Back" style={styles.backImage} />
+      </button>
 
-      {/* Phần 12: Ngày đặt hàng */}
+      <h2 style={styles.title}>Chi tiết đơn hàng</h2>
+      {/* Ngày đặt hàng */}
       <div style={styles.section}>
         <h3>Ngày đặt hàng</h3>
         <p>{new Date(order.orderDate).toLocaleString("vi-VN")}</p>
       </div>
-
-      {/* Phần 8: Thông tin người nhận */}
+      {/* Thông tin người nhận */}
       <div style={styles.section}>
         <h3>Thông tin người nhận</h3>
         <p>
@@ -87,40 +89,42 @@ const OrderDetail = () => {
         </p>
       </div>
 
-      {/* Phần 9: Thông tin sản phẩm */}
+      {/* Thông tin sản phẩm */}
       <div style={styles.section}>
-        <h3>Sản phẩm đã mua</h3>
-        <table style={styles.table}>
-          <thead>
-            <tr>
-              <th style={styles.tableHeader}>Sản phẩm</th>
-              <th style={styles.tableHeader}>Tên sản phẩm</th>
-              <th style={styles.tableHeader}>Màu sắc</th>
-              <th style={styles.tableHeader}>Size</th>
-              <th style={styles.tableHeader}>Số lượng</th>
-              <th style={styles.tableHeader}>Giá</th>
-            </tr>
-          </thead>
-          <tbody>
-            {order?.products.map((product, index) => (
-              <tr key={index}>
-                <td style={styles.tableCell}>{product?.productId?._id}</td>
-                <td style={styles.tableCell}>
-                  {product?.productId?.name_product}
-                </td>
-                <td style={styles.tableCell}>{product.color}</td>
-                <td style={styles.tableCell}>{product.size}</td>
-                <td style={styles.tableCell}>{product.quantity}</td>
-                <td style={styles.tableCell}>
-                  {product.price.toLocaleString()} VND
-                </td>
+        <div style={styles.section}>
+          <h3>Sản phẩm đã mua</h3>
+          <table style={styles.table}>
+            <thead>
+              <tr>
+                <th style={styles.tableHeader}>Sản phẩm</th>
+                <th style={styles.tableHeader}>Tên sản phẩm</th>
+                <th style={styles.tableHeader}>Màu sắc</th>
+                <th style={styles.tableHeader}>Size</th>
+                <th style={styles.tableHeader}>Số lượng</th>
+                <th style={styles.tableHeader}>Giá</th>
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {order?.products.map((product, index) => (
+                <tr key={index}>
+                  <td style={styles.tableCell}>{product?.productId?._id}</td>
+                  <td style={styles.tableCell}>
+                    {product?.productId?.name_product}
+                  </td>
+                  <td style={styles.tableCell}>{product.color}</td>
+                  <td style={styles.tableCell}>{product.size}</td>
+                  <td style={styles.tableCell}>{product.quantity}</td>
+                  <td style={styles.tableCell}>
+                    {product.price.toLocaleString()} VND
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
       </div>
 
-      {/* Phần 10 & 11: Tổng tiền & thanh toán */}
+      {/* Tổng tiền */}
       <div style={styles.section}>
         <h3>Tổng số tiền</h3>
         <p>
@@ -137,16 +141,12 @@ const OrderDetail = () => {
         </p>
       </div>
 
-      {/* Phần 6: Trạng thái đơn hàng */}
+      {/* Trạng thái đơn hàng */}
       <div style={styles.section}>
         <h3>Trạng thái đơn hàng</h3>
         <p>
           <strong>Trạng thái hiện tại:</strong> {STATUS[order.status]}
         </p>
-      </div>
-
-      {/* Phần 7: Lịch sử trạng thái */}
-      <div style={styles.section}>
         <h3>Lịch sử trạng thái:</h3>
         {order.statusHistory.map((status, index) => (
           <div
@@ -160,8 +160,8 @@ const OrderDetail = () => {
               <strong>{new Date(status.date).toLocaleString("vi-VN")}</strong>
             </p>
             <p style={{ color: "white" }}>
-              {STATUS[status.status]} (Người thực hiện:{" "}
-              {status.changedBy.fullname})
+              {STATUS[status.status]} ( Người thực hiện :{" "}
+              {status.changedBy.fullname} )
             </p>
           </div>
         ))}
@@ -169,7 +169,6 @@ const OrderDetail = () => {
     </div>
   );
 };
-
 const styles = {
   container: {
     padding: "30px",
@@ -193,11 +192,35 @@ const styles = {
     fontSize: "16px",
     color: "#555",
   },
+  backButton: {
+    padding: "10px 20px",
+    color: "white",
+    border: "none",
+    borderRadius: "5px",
+    cursor: "pointer",
+    marginBottom: "20px",
+    fontSize: "16px",
+    display: "inline-flex",
+    alignItems: "center",
+  },
+  backImage: {
+    width: "20px",
+    height: "20px",
+    marginRight: "8px", // Giữ khoảng cách giữa biểu tượng và chữ nếu có
+  },
+  product: {
+    padding: "15px",
+    border: "1px solid #ddd",
+    borderRadius: "6px",
+    marginBottom: "15px",
+    backgroundColor: "#fafafa",
+  },
   statusHistory: {
     padding: "12px",
     border: "1px solid #ddd",
     borderRadius: "6px",
     marginBottom: "10px",
+    backgroundColor: "#f1f1f1",
     transition: "background-color 0.3s ease",
   },
   table: {
@@ -220,6 +243,30 @@ const styles = {
     textAlign: "left",
     color: "#555",
     fontSize: "14px",
+  },
+  tableRow: {
+    transition: "background-color 0.3s ease",
+  },
+  tableRowHover: {
+    backgroundColor: "#f1f1f1",
+  },
+  totalAmountSection: {
+    fontSize: "18px",
+    fontWeight: "bold",
+    color: "#333",
+    borderTop: "2px solid #ddd",
+    paddingTop: "20px",
+  },
+  paymentMethod: {
+    fontSize: "16px",
+    marginTop: "10px",
+  },
+  statusColor: {
+    padding: "8px",
+    borderRadius: "5px",
+    textAlign: "center",
+    fontWeight: "bold",
+    color: "white",
   },
 };
 
