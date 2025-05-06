@@ -33,6 +33,11 @@ function AppLayout() {
           <Route path="/register" element={<Register />} />
           <Route path="/login" element={<Login />} />
           <Route path="/users" element={<UserList />} />
+          <Route path="/orders/:id" element={<OrderDetail />} />
+          <Route path="/products" element={<ProductList />} />
+          <Route path="/products/create" element={<ProductCreate />} />
+          <Route path="/products/edit/:id" element={<ProductEdit />} />
+          <Route path="/chat" element={<ChatWeb />} />
 
         </Routes>
       </div>

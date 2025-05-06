@@ -48,7 +48,7 @@ const UserList = () => {
                     Quản lý người dùng
                 </h2>
                 {error && <p style={{ color: 'red', textAlign: 'center' }}>{error}</p>}
-    
+
                 <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '14px' }}>
                     <thead>
                         <tr>
@@ -74,8 +74,8 @@ const UserList = () => {
             </div>
         </div>
     );
-    
-    
+
+
 };
 
 const styles = {

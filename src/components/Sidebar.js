@@ -12,6 +12,8 @@ const Sidebar = () => {
                 <NavLink to="/users">Quản lý người dùng</NavLink>
                 <NavLink to="/orders">Quản lý đơn hàng</NavLink>
                 <NavLink to="/stats">Thống kê</NavLink>
+                <NavLink to="/stats">Nhắn Tin</NavLink>
+
             </nav>
         </div>
     );
