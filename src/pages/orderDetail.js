@@ -20,9 +20,10 @@ const paymentStatus = {
 
 const OrderDetail = () => {
   const { id } = useParams(); // Lấy id từ URL
-  const [order, setOrder] = useState(null);
+  const [order, setOrder] = useState(null); // chứa dữ liệu chi tiết đơn hàng sau khi fetch từ server
   const navigate = useNavigate();
   const getStatusColor = (status) => {
+    // trả về màu tương ứng với trạng thái đơn hàng
     switch (status) {
       case "Pending":
         return "#FFCC00"; // Màu vàng
@@ -36,6 +37,7 @@ const OrderDetail = () => {
   };
 
   useEffect(() => {
+    // gọi api backend và set vào state order
     const fetchOrder = async () => {
       try {
         const res = await getDetail(id);
